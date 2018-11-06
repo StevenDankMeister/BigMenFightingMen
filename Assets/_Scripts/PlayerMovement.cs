@@ -23,9 +23,14 @@ public class PlayerMovement : MonoBehaviour {
     SpriteRenderer spriteRenderer;
 
     private bool ground = true;
-    private bool attacking;
+    private bool attacking = false;
+    private bool stunned = false;
     private bool facingRight = true;
     private bool facingLeft;
+
+    private float frame = 0;
+
+    AttackParameters atk1;
 
     private GameObject move;
 
@@ -33,17 +38,30 @@ public class PlayerMovement : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
         bound = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        //Initialize all attacks
+        atk1 = attack1.GetComponent<AttackParameters>();
 	}
 
-	void FixedUpdate () {
+    void Update()
+    {
+        frame += 1;
+    }
+
+    void FixedUpdate () {
         mirrorSprite();
+
+        if (stunned)
+        {
+            return;
+        }
 
         if (Input.GetButton(PlayerNum + "Jump"))
         {
             if (ground)
             {
                 ground = false;
-                Vector3 jump = new Vector3(rb.velocity.x, 5f, 0.0f);
+                Vector3 jump = new Vector3(rb.velocity.x, 8f, 0.0f);
 
                 rb.velocity = jump;
             }          
@@ -52,7 +70,7 @@ public class PlayerMovement : MonoBehaviour {
         if (Input.GetButton(PlayerNum + "Horizontal"))
         {
             float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
-
+            
             if(moveHorizontal > 0)
             {
                 facingRight = true;
@@ -75,11 +93,11 @@ public class PlayerMovement : MonoBehaviour {
         }
 
         if (Input.GetButton(PlayerNum + "Fire1"))
-        {
+        {            
+            //print(attacking);
             if (!attacking)
             {
                 attacking = true;
-                spriteRenderer.sprite = punch1;
                 StartCoroutine(fireAttack(attack1));
             }
         }
@@ -89,22 +107,25 @@ public class PlayerMovement : MonoBehaviour {
     {
         if (collision.tag != PlayerNum+"Attack")
         {
-            health = health - 1;
+            //get attack params
+            AttackParameters collisionParams = collision.GetComponent<AttackParameters>();
+            
+            health = health - collisionParams.damage;
             double hit = collision.transform.position.x;
 
             if(hit > rb.transform.position.x)
-            {
-                rb.AddForce(new Vector2(-2f, 5f)*50f);
+            {                
+                rb.AddForce(collisionParams.attackForceLeft*50f);
             }
-            else if(hit < rb.transform.position.y)
-            {
-                rb.AddForce(new Vector2(2f,5f)*-50f);
+            else if(hit < rb.transform.position.x)
+            {               
+                rb.AddForce(collisionParams.attackForceRight*50f);
             }
         }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
-    {
+    {    
         ground = true;
     }
 
@@ -128,11 +149,20 @@ public class PlayerMovement : MonoBehaviour {
 
     public IEnumerator fireAttack(GameObject attack)
     {
+        stunned = true;
+
+        float attackTime = atk1.waitFrames;
+        float stunTime = atk1.stunFrames;
+        float attackStartFrame = frame;
+
+        //wait before attack is executed
+        yield return new WaitWhile(() => attackStartFrame > frame - attackTime);
+
         Vector3 playerpos = this.transform.position;
         Vector3 spawnPos;
 
         if (facingRight)
-        {
+        {          
             spawnPos = new Vector3(playerpos.x + bound.bounds.size.x, playerpos.y, playerpos.z);
             createAttack(spawnPos, attack);
             
@@ -143,9 +173,10 @@ public class PlayerMovement : MonoBehaviour {
             createAttack(spawnPos, attack);
         }
 
-        yield return new WaitForSeconds(0.2f);
+        //wait before stun is removed
+        yield return new WaitWhile(() => attackStartFrame > frame - stunTime);
         Destroy(move);
-        spriteRenderer.sprite = idle;
+        stunned = false;
         attacking = false;
     }
 }
