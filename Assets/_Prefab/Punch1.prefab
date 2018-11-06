@@ -80,9 +80,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 5
   waitFrames: 10
-  stunFrames: 30
-  attackForceLeft: {x: -5, y: 2}
-  attackForceRight: {x: 5, y: 2}
+  selfStunFrames: 40
+  enemyStunFrames: 31
+  attackForceLeft: {x: -2, y: 2}
+  attackForceRight: {x: 2, y: 2}
 --- !u!212 &212858967161928454
 SpriteRenderer:
   m_ObjectHideFlags: 1
