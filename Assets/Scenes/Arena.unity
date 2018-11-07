@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 103125880}
   m_Layer: 0
   m_Name: GameObject
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -295,7 +295,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 3817e628a4ff3374a8b5f74ae5a5cd04, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 14.37, y: 18.67}
@@ -317,7 +317,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
@@ -348,7 +348,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 231371424}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.353, y: -3.206, z: 0}
+  m_LocalPosition: {x: 5.37, y: -2.71, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.83454}
   m_Children: []
   m_Father: {fileID: 0}
@@ -386,7 +386,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
@@ -417,15 +417,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 936230778}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-<<<<<<< HEAD
-<<<<<<< HEAD
   m_LocalPosition: {x: -1.04, y: -2.89, z: 0}
-=======
-  m_LocalPosition: {x: -0.78, y: -2.33, z: 0}
->>>>>>> d4ab5375125ebc55347501bc99d1811ebfd2e2de
-=======
-  m_LocalPosition: {x: -0.98, y: -3.214, z: 0}
->>>>>>> parent of 8eb8ae6... getting hit cancels any buffering attacks
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.83454}
   m_Children: []
   m_Father: {fileID: 0}
