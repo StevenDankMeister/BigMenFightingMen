@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
 
-
-    //variables
     public float speed;
     public float health;
 
@@ -23,20 +21,17 @@ public class PlayerMovement : MonoBehaviour {
     Rigidbody2D rb;
     Collider2D bound;
     SpriteRenderer spriteRenderer;
-    AttackParameters atk1;
-    
-    private bool grounded = true;
 
-    //states
+    private bool ground = true;
     private bool attacking = false;
     private bool stunned = false;
-
     private bool facingRight = true;
     private bool facingLeft;
 
     private float frame = 0;
 
-    //used when instantiating an attack
+    AttackParameters atk1;
+
     private GameObject move;
 
     void Start () {
@@ -54,25 +49,26 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     void FixedUpdate () {
-        //check if character is facing left or right
         mirrorSprite();
 
-        //if stunned, character can't move or attack
         if (stunned)
         {
             return;
         }
 
-        if (Input.GetButton(PlayerNum + "Jump") && grounded)
+        if (Input.GetButton(PlayerNum + "Jump"))
         {
-            grounded = false;
-            Vector3 jump = new Vector3(rb.velocity.x, 3f, 0.0f);
-            rb.velocity = jump;
+            if (ground)
+            {
+                ground = false;
+                Vector3 jump = new Vector3(rb.velocity.x, 8f, 0.0f);
+
+                rb.velocity = jump;
+            }          
         }
 
         if (Input.GetButton(PlayerNum + "Horizontal"))
         {
-            print("moving");
             float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
             
             if(moveHorizontal > 0)
@@ -90,6 +86,7 @@ public class PlayerMovement : MonoBehaviour {
 
             rb.velocity = movement;
         }
+
         if(Input.GetButtonUp(PlayerNum + "Horizontal"))
         {
             rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
@@ -97,70 +94,39 @@ public class PlayerMovement : MonoBehaviour {
 
         if (Input.GetButton(PlayerNum + "Fire1"))
         {            
-            //can't attack if already attacking
+            //print(attacking);
             if (!attacking)
             {
                 attacking = true;
                 StartCoroutine(fireAttack(attack1));
-                spriteRenderer.sprite = punch1;
             }
         }
 	}
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag != PlayerNum+"Attack")
         {
-            AttackParameters collisionParams = collision.GetComponent<AttackParameters>();
-            //get frame character was hit on
-            float hitFrame = frame;
-            float framesToWait = collisionParams.enemyStunFrames;
-
-            stunned = true;
-            attacking = false;
-
-            //remove all velocity to prevent sliding in air
-            rb.velocity = Vector3.zero;
-
             //get attack params
-
+            AttackParameters collisionParams = collision.GetComponent<AttackParameters>();
+            
             health = health - collisionParams.damage;
-            float hit = collision.transform.position.x;
+            double hit = collision.transform.position.x;
 
-            if (hit > rb.transform.position.x)
-            {
-                rb.AddForce(collisionParams.attackForceLeft * 50f);
+            if(hit > rb.transform.position.x)
+            {                
+                rb.AddForce(collisionParams.attackForceLeft*50f);
             }
-            else if (hit < rb.transform.position.x)
-            {
-                rb.AddForce(collisionParams.attackForceRight * 50f);
+            else if(hit < rb.transform.position.x)
+            {               
+                rb.AddForce(collisionParams.attackForceRight*50f);
             }
-
-            StartCoroutine(resetStates(hitFrame, framesToWait));
         }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            grounded = true;
-        }
-    }
-
-    void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            grounded = true;
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        if(collision.gameObject.tag == "Ground")
-        {
-            grounded = false;
-        }
+    {    
+        ground = true;
     }
 
     void mirrorSprite()
@@ -181,35 +147,17 @@ public class PlayerMovement : MonoBehaviour {
         move.tag = PlayerNum + "Attack";
     }
 
-    public IEnumerator resetStates(float frameStart, float stunnedFrames)
-    {
-        print("test");
-        yield return new WaitWhile(() => frameStart > frame - stunnedFrames);
-        
-        stunned = false;
-    }
-
     public IEnumerator fireAttack(GameObject attack)
     {
         stunned = true;
 
         float attackTime = atk1.waitFrames;
-        float stunTime = atk1.selfStunFrames;
-        float startFrame = frame;
+        float stunTime = atk1.stunFrames;
+        float attackStartFrame = frame;
 
         //wait before attack is executed
-        yield return new WaitWhile(() => startFrame > frame - attackTime);
+        yield return new WaitWhile(() => attackStartFrame > frame - attackTime);
 
-        //make sure character is still eligible to attack
-        //in the instance character has been attacked before own attack is executed
-        //attack is cancelled
-        if (!attacking)
-        {
-            print("attack cancelled");
-            yield break;
-        }
-
-        print("starting attack");
         Vector3 playerpos = this.transform.position;
         Vector3 spawnPos;
 
@@ -224,16 +172,11 @@ public class PlayerMovement : MonoBehaviour {
             spawnPos = new Vector3(playerpos.x + -bound.bounds.size.x, playerpos.y, playerpos.z);
             createAttack(spawnPos, attack);
         }
-        //set new start frame
-        startFrame = frame;
-        //all moves destroyed after 10 frames
-        yield return new WaitWhile(() => startFrame > frame - 10);
-        Destroy(move);
 
         //wait before stun is removed
-        yield return new WaitWhile(() => startFrame > frame - stunTime);
+        yield return new WaitWhile(() => attackStartFrame > frame - stunTime);
+        Destroy(move);
         stunned = false;
         attacking = false;
-        spriteRenderer.sprite = idle;
     }
 }
