@@ -21,9 +21,10 @@ public class PlayerMovement : MonoBehaviour
     public GameObject attack1;
     public Sprite idle;
     public Sprite punch1;
+    public Sprite crouch;
 
     Rigidbody2D rb;
-    Collider2D bound;
+    BoxCollider2D bound;
     SpriteRenderer spriteRenderer;
     AttackParameters atk1;
 
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     //states
     private bool attacking = false;
     private bool stunned = false;
+    private bool crouched = false;
 
     private bool facingRight = true;
     private bool facingLeft;
@@ -44,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        bound = GetComponent<Collider2D>();
+        bound = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         //Initialize all attacks
@@ -67,6 +69,19 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        if (Input.GetButton(PlayerNum + "Crouch"))
+        {
+            crouched = true;
+            spriteRenderer.sprite = crouch;
+            print(spriteRenderer.sprite.bounds.size);
+            bound.size = spriteRenderer.sprite.bounds.size;
+        }
+        else
+        {
+            crouched = false;
+        }
+
+        print(crouched);
         if (Input.GetButton(PlayerNum + "Jump") && grounded)
         {
             grounded = false;
@@ -220,13 +235,13 @@ public class PlayerMovement : MonoBehaviour
 
         if (facingRight)
         {
-            spawnPos = new Vector3(playerpos.x + bound.bounds.size.x, playerpos.y, playerpos.z);
+            spawnPos = new Vector3(playerpos.x + bound.bounds.size.x-0.2f, playerpos.y, playerpos.z);
             createAttack(spawnPos, attack);
 
         }
         else if (facingLeft)
         {
-            spawnPos = new Vector3(playerpos.x + -bound.bounds.size.x, playerpos.y, playerpos.z);
+            spawnPos = new Vector3(playerpos.x + -bound.bounds.size.x+0.2f, playerpos.y, playerpos.z);
             createAttack(spawnPos, attack);
         }
         //set new start frame
