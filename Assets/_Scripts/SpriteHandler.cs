@@ -33,5 +33,9 @@ public class SpriteHandler : MonoBehaviour {
         hitbox.size = hitbox_size;
     }
 
-
+    public void setSprite(Sprite sprite, GameObject ch)
+    {
+        SpriteRenderer s = ch.GetComponent<SpriteRenderer>();
+        s.sprite = sprite;
+    }
 }

@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class AttackParameters : MonoBehaviour
 {
+    public enum AttackType{
+        High,
+        Mid,
+        Low
+    }
 
+    public AttackType attackType;
     public float damage;
     public float waitFrames;
     public float selfStunFrames;
