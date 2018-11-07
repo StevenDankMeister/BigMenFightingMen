@@ -4,14 +4,23 @@ using UnityEngine;
 
 public class AutoDestroy : MonoBehaviour {
 
-	// Use this for initialization
+    private double frame = 0;
+    private double startFrame = 0;
+
 	void Start () {
         StartCoroutine(autoDestroy());
 	}
-	
-	public IEnumerator autoDestroy()
+
+    void Update()
     {
-        yield return new WaitForSeconds(0.1f);
+        frame += 1;
+    }
+
+    public IEnumerator autoDestroy()
+    {
+        //print("created at " + frame);
+        yield return new WaitWhile(() => startFrame > frame - 10);
         Destroy(this.gameObject);
+        //print("destroyed at " + frame);
     }
 }

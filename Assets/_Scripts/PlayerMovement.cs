@@ -35,8 +35,8 @@ public class PlayerMovement : MonoBehaviour
     private bool stunned = false;
     private bool crouched = false;
 
-    private bool facingRight = true;
-    private bool facingLeft;
+    public bool facingRight;
+    public bool facingLeft;
 
     private float frame = 0;
 
@@ -61,7 +61,12 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         //check if character is facing left or right
-        mirrorSprite();
+        SpriteHandler.spriteHandler.characterDirection(facingLeft, facingRight, this.gameObject);
+        
+        //set sprite hitbox
+        SpriteHandler.spriteHandler.setHitbox(this.gameObject);
+
+        stopSlide();
 
         //if stunned, character can't move or attack
         if (stunned)
@@ -73,15 +78,13 @@ public class PlayerMovement : MonoBehaviour
         {
             crouched = true;
             spriteRenderer.sprite = crouch;
-            print(spriteRenderer.sprite.bounds.size);
-            bound.size = spriteRenderer.sprite.bounds.size;
         }
         else
         {
             crouched = false;
+            spriteRenderer.sprite = idle;
         }
 
-        print(crouched);
         if (Input.GetButton(PlayerNum + "Jump") && grounded)
         {
             grounded = false;
@@ -108,7 +111,8 @@ public class PlayerMovement : MonoBehaviour
             Vector3 movement = new Vector3(moveHorizontal * speed, rb.velocity.y, 0.0f);
 
             rb.velocity = movement;
-        }
+        }      
+
         if (Input.GetButtonUp(PlayerNum + "Horizontal"))
         {
             rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
@@ -182,22 +186,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void mirrorSprite()
+    void stopSlide()
     {
-        if (facingRight)
+        if(!Input.GetButton(PlayerNum + "Horizontal") && !stunned)
         {
-            spriteRenderer.flipX = false;
+            rb.velocity = new Vector3(0, rb.velocity.y, 0.0f);
+            print("stopped slide");
         }
-        else if (facingLeft)
-        {
-            spriteRenderer.flipX = true;
-        }
-    }
-
-    void createAttack(Vector3 pos, GameObject attack)
-    {
-        move = Instantiate(attack, pos, Quaternion.identity);
-        move.tag = PlayerNum + "Attack";
     }
 
     public IEnumerator resetStates(float frameStart, float stunnedFrames)
@@ -231,24 +226,22 @@ public class PlayerMovement : MonoBehaviour
 
         print("starting attack");
         Vector3 playerpos = this.transform.position;
-        Vector3 spawnPos;
+        Vector3 spawnPos = new Vector3(playerpos.x + bound.bounds.extents.x, playerpos.y, playerpos.z);
 
-        if (facingRight)
+        if (facingLeft)
         {
-            spawnPos = new Vector3(playerpos.x + bound.bounds.size.x-0.2f, playerpos.y, playerpos.z);
-            createAttack(spawnPos, attack);
-
+            //spawn pos at other side
+            spawnPos.x = playerpos.x - bound.bounds.extents.x;        
         }
-        else if (facingLeft)
-        {
-            spawnPos = new Vector3(playerpos.x + -bound.bounds.size.x+0.2f, playerpos.y, playerpos.z);
-            createAttack(spawnPos, attack);
-        }
+        AttackHandler.attackHandler.createAttack(spawnPos, attack, PlayerNum + "Attack");
         //set new start frame
         startFrame = frame;
-        //all moves destroyed after 10 frames
-        yield return new WaitWhile(() => startFrame > frame - 10);
-        Destroy(move);
+        
+        /*handled by autodestroy.cs
+            all moves destroyed after 10 frames
+            yield return new WaitWhile(() => startFrame > frame - 10);
+            Destroy(move);
+        */
 
         //wait before stun is removed
         yield return new WaitWhile(() => startFrame > frame - stunTime);
