@@ -207,7 +207,8 @@ public class PlayerMovement : MonoBehaviour
 
     void stopSlide()
     {
-        if(!Input.GetButton(PlayerNum + "Horizontal") && !stunned)
+        //todo: grounded
+        if (!Input.GetButton(PlayerNum + "Horizontal") && !stunned)
         {
             rb.velocity = new Vector3(0, rb.velocity.y, 0.0f);
             print("stopped slide");
