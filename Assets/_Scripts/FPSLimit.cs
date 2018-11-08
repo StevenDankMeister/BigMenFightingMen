@@ -5,7 +5,16 @@ using UnityEngine;
 public class FPSLimit : MonoBehaviour {
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
 	}
+
+    void Update()
+    {
+        if (Application.targetFrameRate != 60)
+        {
+            Application.targetFrameRate = 60;
+        }
+    }
 }

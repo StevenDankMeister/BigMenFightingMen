@@ -1,14 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
-
-
     //variables
     public float speed;
-    public float health;
+    public float maxHealth;
 
     public enum PlayerNumber
     {
@@ -18,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     public PlayerNumber PlayerNum;
 
-    
+    public Sprite crouchAttack;
     public Sprite idle;
     public Sprite punch1;
     public Sprite crouch;
@@ -26,13 +25,15 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D rb;
     BoxCollider2D bound;
     SpriteRenderer spriteRenderer;
-    
+        
     //attacks
     public GameObject attack1;
     public GameObject attack2;
+    public GameObject attack3;
 
     AttackParameters atk1;
     AttackParameters atk2;
+    AttackParameters atk3;
 
     private bool grounded = true;
 
@@ -46,6 +47,11 @@ public class PlayerMovement : MonoBehaviour
     public bool facingLeft;
 
     private float frame = 0;
+    private float crouchSpeed;
+    private float runSpeed;
+    private float currentHP;
+
+    private Slider healthBar;
 
     //used when instantiating an attack
     private GameObject move;
@@ -56,25 +62,30 @@ public class PlayerMovement : MonoBehaviour
         bound = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
+        crouchSpeed = speed / 2;
+        runSpeed = speed;
+        currentHP = maxHealth;
+
+        healthBar = GameObject.Find(PlayerNum + "HP").GetComponent<Slider>();
+        
         //Initialize all attacks
         atk1 = attack1.GetComponent<AttackParameters>();
         atk2 = attack2.GetComponent<AttackParameters>();
+        atk3 = attack3.GetComponent<AttackParameters>();
     }
 
     void Update()
     {
         frame += 1;
-    }
 
-    void FixedUpdate()
-    {
+        healthBar.value = currentHP / maxHealth;
+        //print(currentHP);
+
         //check if character is facing left or right
         SpriteHandler.spriteHandler.characterDirection(facingLeft, facingRight, this.gameObject);
-        
+
         //set sprite hitbox
         SpriteHandler.spriteHandler.setHitbox(this.gameObject);
-
-        stopSlide();
 
         //if stunned, character can't move or attack
         if (stunned)
@@ -82,27 +93,36 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        if (Input.GetButton(PlayerNum + "Crouch"))
+        if (Input.GetButton(PlayerNum + "Crouch") && !attacking)
         {
             crouched = true;
             spriteRenderer.sprite = crouch;
+            runSpeed = crouchSpeed;
+
+            if (Input.GetButton(PlayerNum + "Fire1"))
+            {
+                attacking = true;
+                StartCoroutine(fireAttack(attack3));
+                SpriteHandler.spriteHandler.setSprite(crouchAttack, this.gameObject);
+            }
         }
         else
         {
             crouched = false;
+            runSpeed = speed;
             spriteRenderer.sprite = idle;
         }
 
         if (Input.GetButton(PlayerNum + "Jump") && grounded)
         {
             grounded = false;
-            Vector3 jump = new Vector3(rb.velocity.x, 3f, 0.0f);
+            Vector3 jump = new Vector3(rb.velocity.x, 4f, 0.0f);
             rb.velocity = jump;
         }
 
         if (Input.GetButton(PlayerNum + "Horizontal"))
         {
-            print("moving");
+            //print("moving");
             float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
 
             if (moveHorizontal > 0)
@@ -116,10 +136,10 @@ public class PlayerMovement : MonoBehaviour
                 facingLeft = true;
             }
 
-            Vector3 movement = new Vector3(moveHorizontal * speed, rb.velocity.y, 0.0f);
+            Vector3 movement = new Vector3(moveHorizontal * runSpeed, rb.velocity.y, 0.0f);
 
             rb.velocity = movement;
-        }      
+        }
 
         if (Input.GetButtonUp(PlayerNum + "Horizontal"))
         {
@@ -137,7 +157,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if(Input.GetButton(PlayerNum + "Fire2"))
+        if (Input.GetButton(PlayerNum + "Fire2"))
         {
             if (!attacking)
             {
@@ -146,6 +166,11 @@ public class PlayerMovement : MonoBehaviour
                 spriteRenderer.sprite = punch1;
             }
         }
+    }
+
+    void FixedUpdate()
+    {
+        stopSlide();
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -165,7 +190,7 @@ public class PlayerMovement : MonoBehaviour
 
             //get attack params
 
-            health = health - collisionParams.damage;
+            currentHP = currentHP - collisionParams.damage;
             float hit = collision.transform.position.x;
 
             if (hit > this.transform.position.x)
@@ -203,7 +228,7 @@ public class PlayerMovement : MonoBehaviour
         {
             grounded = false;
         }
-    }
+    }    
 
     void stopSlide()
     {
@@ -211,13 +236,12 @@ public class PlayerMovement : MonoBehaviour
         if (!Input.GetButton(PlayerNum + "Horizontal") && !stunned)
         {
             rb.velocity = new Vector3(0, rb.velocity.y, 0.0f);
-            print("stopped slide");
+            //print("stopped slide");
         }
     }
 
     public IEnumerator resetStates(float frameStart, float stunnedFrames)
-    {
-        print("test");
+    {        
         yield return new WaitWhile(() => frameStart > frame - stunnedFrames);
 
         stunned = false;
@@ -227,7 +251,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            spriteRenderer.sprite = idle;
+            SpriteHandler.spriteHandler.setSprite(idle, this.gameObject);
         }
     }
 
@@ -264,6 +288,7 @@ public class PlayerMovement : MonoBehaviour
             spawnPos.x = playerpos.x - bound.bounds.extents.x;        
         }
         AttackHandler.attackHandler.CreateAttack(spawnPos, attack, PlayerNum + "Attack");
+        rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
         //set new start frame
         startFrame = frame;
         
@@ -277,6 +302,13 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitWhile(() => startFrame > frame - stunTime);
         stunned = false;
         attacking = false;
-        spriteRenderer.sprite = idle;
+        if (crouched)
+        {
+            SpriteHandler.spriteHandler.setSprite(crouch, this.gameObject);
+        }
+        else
+        {
+            SpriteHandler.spriteHandler.setSprite(idle, this.gameObject);
+        }
     }
 }
