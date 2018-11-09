@@ -17,11 +17,6 @@ public class PlayerMovement : MonoBehaviour
 
     public PlayerNumber PlayerNum;
 
-    public Sprite crouchAttack;
-    public Sprite idle;
-    public Sprite punch1;
-    public Sprite crouch;
-
     public Animator chrAnimation;
 
     Rigidbody2D rb;
@@ -74,10 +69,8 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         frame += 1;
-        print(chrAnimation.GetInteger("States"));
 
         healthBar.value = currentHP / maxHealth;
-        //print(currentHP);
 
         //check if character is facing left or right
         SpriteHandler.spriteHandler.characterDirection(facingLeft, facingRight, this.gameObject);
@@ -99,21 +92,20 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButton(PlayerNum + "Crouch") && !attacking)
         {
             crouched = true;
-            spriteRenderer.sprite = crouch;
+            //crouch sprite
             runSpeed = crouchSpeed;
 
             if (Input.GetButton(PlayerNum + "Fire1"))
             {
                 attacking = true;
                 StartCoroutine(fireAttack(attack3));
-                SpriteHandler.spriteHandler.setSprite(crouchAttack, this.gameObject);
+                //crouch attack sprite
             }
         }
         else
         {
             crouched = false;
             runSpeed = speed;
-            spriteRenderer.sprite = idle;
         }
 
         if (Input.GetButton(PlayerNum + "Jump") && grounded)
@@ -170,8 +162,7 @@ public class PlayerMovement : MonoBehaviour
             if (!attacking)
             {
                 attacking = true;
-                StartCoroutine(fireAttack(attack2));
-                spriteRenderer.sprite = punch1;
+                StartCoroutine(fireAttack(attack2));                
             }
         }
     }
@@ -255,11 +246,13 @@ public class PlayerMovement : MonoBehaviour
         stunned = false;
         if (crouched)
         {
-            SpriteHandler.spriteHandler.setSprite(crouch, this.gameObject);
+            //crouch sprite
+            
         }
         else
         {
-            SpriteHandler.spriteHandler.setSprite(idle, this.gameObject);
+            //idle sprite
+            
         }
     }
 
@@ -268,13 +261,11 @@ public class PlayerMovement : MonoBehaviour
         //prevent slide attack
         rb.velocity = new Vector3(0, rb.velocity.y, 0.0f);
         stunned = true;
-
         attackParams = attack.GetComponent<AttackParameters>();
 
         float attackTime = attackParams.waitFrames;
         float stunTime = attackParams.selfStunFrames;
         float startFrame = frame;
-
         //wait before attack is executed
         yield return new WaitWhile(() => startFrame > frame - attackTime);
 
@@ -314,11 +305,11 @@ public class PlayerMovement : MonoBehaviour
         attacking = false;
         if (crouched)
         {
-            SpriteHandler.spriteHandler.setSprite(crouch, this.gameObject);
+            //crouch sprite            
         }
         else
         {
-            SpriteHandler.spriteHandler.setSprite(idle, this.gameObject);
+            //idle sprite            
         }
     }
 }

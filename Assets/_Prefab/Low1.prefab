@@ -93,7 +93,7 @@ MonoBehaviour:
   attackType: 2
   damage: 5
   waitFrames: 10
-  selfStunFrames: 40
+  selfStunFrames: 15
   enemyStunFrames: 31
   attackForceLeft: {x: -2, y: 2}
   attackForceRight: {x: 2, y: 2}
