@@ -120,7 +120,7 @@ public class PlayerMovement : MonoBehaviour
         {
             //print("moving");
             float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
-            if (grounded && !attacking)
+            if (grounded && !attacking && !crouched)
             {
                 SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 1);
             }
@@ -244,15 +244,16 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitWhile(() => frameStart > frame - stunnedFrames);
 
         stunned = false;
+        attacking = false;
         if (crouched)
         {
             //crouch sprite
-            
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
         else
         {
             //idle sprite
-            
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
     }
 
@@ -300,16 +301,7 @@ public class PlayerMovement : MonoBehaviour
         */
 
         //wait before stun is removed
-        yield return new WaitWhile(() => startFrame > frame - stunTime);
-        stunned = false;
-        attacking = false;
-        if (crouched)
-        {
-            //crouch sprite            
-        }
-        else
-        {
-            //idle sprite            
-        }
+        //yield return new WaitWhile(() => startFrame > frame - stunTime);
+        StartCoroutine(resetStates(startFrame, stunTime));
     }
 }
