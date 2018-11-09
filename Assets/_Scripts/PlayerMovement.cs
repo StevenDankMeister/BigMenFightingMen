@@ -128,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
         {
             //print("moving");
             float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
-            if (grounded)
+            if (grounded && !attacking)
             {
                 SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 1);
             }
@@ -161,7 +161,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 attacking = true;
                 StartCoroutine(fireAttack(attack1));
-                spriteRenderer.sprite = punch1;
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 3);
             }
         }
 
