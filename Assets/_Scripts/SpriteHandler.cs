@@ -38,4 +38,9 @@ public class SpriteHandler : MonoBehaviour {
         SpriteRenderer s = ch.GetComponent<SpriteRenderer>();
         s.sprite = sprite;
     }
+
+    public void SetAnimation(Animator animator, int animation)
+    {
+        animator.SetInteger("States", animation);
+    }
 }

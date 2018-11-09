@@ -22,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
     public Sprite punch1;
     public Sprite crouch;
 
+    public Animator chrAnimation;
+
     Rigidbody2D rb;
     BoxCollider2D bound;
     SpriteRenderer spriteRenderer;
@@ -31,9 +33,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject attack2;
     public GameObject attack3;
 
-    AttackParameters atk1;
-    AttackParameters atk2;
-    AttackParameters atk3;
+    AttackParameters attackParams;
 
     private bool grounded = true;
 
@@ -61,22 +61,20 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         bound = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        chrAnimation = GetComponent<Animator>();
 
         crouchSpeed = speed / 2;
         runSpeed = speed;
         currentHP = maxHealth;
 
         healthBar = GameObject.Find(PlayerNum + "HP").GetComponent<Slider>();
-        
-        //Initialize all attacks
-        atk1 = attack1.GetComponent<AttackParameters>();
-        atk2 = attack2.GetComponent<AttackParameters>();
-        atk3 = attack3.GetComponent<AttackParameters>();
+       
     }
 
     void Update()
     {
         frame += 1;
+        print(chrAnimation.GetInteger("States"));
 
         healthBar.value = currentHP / maxHealth;
         //print(currentHP);
@@ -89,8 +87,13 @@ public class PlayerMovement : MonoBehaviour
 
         //if stunned, character can't move or attack
         if (stunned)
-        {
+        {            
             return;
+        }
+
+        if(rb.velocity.x == 0 && rb.velocity.y == 0)
+        {
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
 
         if (Input.GetButton(PlayerNum + "Crouch") && !attacking)
@@ -116,15 +119,20 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButton(PlayerNum + "Jump") && grounded)
         {
             grounded = false;
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 2);
             Vector3 jump = new Vector3(rb.velocity.x, 4f, 0.0f);
             rb.velocity = jump;
         }
 
-        if (Input.GetButton(PlayerNum + "Horizontal"))
+        if (Input.GetButton(PlayerNum + "Horizontal"))  
         {
             //print("moving");
             float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
-
+            if (grounded)
+            {
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 1);
+            }
+            
             if (moveHorizontal > 0)
             {
                 facingRight = true;
@@ -139,7 +147,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 movement = new Vector3(moveHorizontal * runSpeed, rb.velocity.y, 0.0f);
 
             rb.velocity = movement;
-        }
+        }        
 
         if (Input.GetButtonUp(PlayerNum + "Horizontal"))
         {
@@ -261,8 +269,10 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector3(0, rb.velocity.y, 0.0f);
         stunned = true;
 
-        float attackTime = atk1.waitFrames;
-        float stunTime = atk1.selfStunFrames;
+        attackParams = attack.GetComponent<AttackParameters>();
+
+        float attackTime = attackParams.waitFrames;
+        float stunTime = attackParams.selfStunFrames;
         float startFrame = frame;
 
         //wait before attack is executed
