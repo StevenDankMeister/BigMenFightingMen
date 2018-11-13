@@ -42,5 +42,6 @@ public class SpriteHandler : MonoBehaviour {
     public void SetAnimation(Animator animator, int animation)
     {
         animator.SetInteger("States", animation);
+        print(animator.GetInteger("States"));
     }
 }

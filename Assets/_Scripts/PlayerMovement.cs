@@ -21,30 +21,34 @@ public class PlayerMovement : MonoBehaviour
 
     Rigidbody2D rb;
     BoxCollider2D bound;
-    SpriteRenderer spriteRenderer;
         
     //attacks
     public GameObject attack1;
     public GameObject attack2;
     public GameObject attack3;
 
+    AttackParameters atk1;
+    AttackParameters atk2;
+    AttackParameters atk3;
+
     AttackParameters attackParams;
-
-    private bool grounded = true;
-
+    
     //states
-    public bool attacking = false;
-    public bool stunned = false;
-    public bool crouched = false;
+    [SerializeField] private bool attacking = false;
+    [SerializeField] private bool stunned = false;
+    [SerializeField] private bool crouched = false;
+    [SerializeField] private bool grounded = true;
+    [SerializeField] private bool moving = false;
 
     //facing
-    public bool facingRight;
-    public bool facingLeft;
+    [SerializeField] private bool facingRight;
+    [SerializeField] private bool facingLeft;
 
     private float frame = 0;
     private float crouchSpeed;
     private float runSpeed;
     private float currentHP;
+    private float moveHorizontal;
 
     private Slider healthBar;
 
@@ -54,8 +58,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        bound = GetComponent<BoxCollider2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        bound = GetComponent<BoxCollider2D>();       
         chrAnimation = GetComponent<Animator>();
 
         crouchSpeed = speed / 2;
@@ -63,7 +66,10 @@ public class PlayerMovement : MonoBehaviour
         currentHP = maxHealth;
 
         healthBar = GameObject.Find(PlayerNum + "HP").GetComponent<Slider>();
-       
+
+        atk1 = attack1.GetComponent<AttackParameters>();
+        atk2 = attack2.GetComponent<AttackParameters>();        
+        atk3 = attack3.GetComponent<AttackParameters>();
     }
 
     void Update()
@@ -80,51 +86,83 @@ public class PlayerMovement : MonoBehaviour
 
         //if stunned, character can't move or attack
         if (stunned)
-        {            
+        {
             return;
         }
 
-        if(rb.velocity.x == 0 && rb.velocity.y == 0)
+        if (rb.velocity.x == 0 && rb.velocity.y == 0 && !crouched)
         {
             SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
 
-        if (Input.GetButton(PlayerNum + "Crouch") && !attacking)
-        {
-            crouched = true;
-            //crouch sprite
-            runSpeed = crouchSpeed;
+        Crouch();
+        Jump();
+        MoveHorizontal();
+        StopHorizontal();
+        Fire1();
+        Fire2();
+    }
 
-            if (Input.GetButton(PlayerNum + "Fire1"))
+    private void Fire1()
+    {
+        if (Input.GetButton(PlayerNum + "Fire1"))
+        {
+            //can't attack if already attacking
+            if (!attacking)
             {
                 attacking = true;
-                StartCoroutine(fireAttack(attack3));
-                //crouch attack sprite
+                StartCoroutine(fireAttack(attack1));
+                // formula:
+                // chrAnimation.speed = 1 = 100% speed
+                // chrAnimation.speed = s * y
+                // s = (frames in animation/attack.waitFrames)
+                // we want the attack to fire halfway through the animation thus y = 2
+                // slow down the animation to account for how long the wait is to find s
+                chrAnimation.speed = (10 / atk1.waitFrames) * 2;
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 3);
             }
         }
-        else
-        {
-            crouched = false;
-            runSpeed = speed;
-        }
+    }
 
-        if (Input.GetButton(PlayerNum + "Jump") && grounded)
+    private void Fire2()
+    {
+        if (Input.GetButton(PlayerNum + "Fire2"))
         {
-            grounded = false;
-            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 2);
-            Vector3 jump = new Vector3(rb.velocity.x, 4f, 0.0f);
-            rb.velocity = jump;
+            if (!attacking)
+            {
+                attacking = true;
+                chrAnimation.speed = (8/ atk2.waitFrames) * 2;
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 8);
+                StartCoroutine(fireAttack(attack2));
+            }
         }
+    }
 
-        if (Input.GetButton(PlayerNum + "Horizontal"))  
+    private void StopHorizontal()
+    {
+        if (Input.GetButtonUp(PlayerNum + "Horizontal"))
         {
-            //print("moving");
-            float moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
+            rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
+        }
+    }
+
+    private void MoveHorizontal()
+    {
+        if (Input.GetButton(PlayerNum + "Horizontal"))
+        {
+            moving = true;
+            moveHorizontal = Input.GetAxis(PlayerNum + "Horizontal");
             if (grounded && !attacking && !crouched)
             {
                 SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 1);
             }
-            
+
+            if (crouched && !attacking)
+            {
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 5);
+            }
+           
+
             if (moveHorizontal > 0)
             {
                 facingRight = true;
@@ -139,31 +177,48 @@ public class PlayerMovement : MonoBehaviour
             Vector3 movement = new Vector3(moveHorizontal * runSpeed, rb.velocity.y, 0.0f);
 
             rb.velocity = movement;
-        }        
-
-        if (Input.GetButtonUp(PlayerNum + "Horizontal"))
-        {
-            rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
         }
-
-        if (Input.GetButton(PlayerNum + "Fire1"))
+        else
         {
-            //can't attack if already attacking
-            if (!attacking)
-            {
-                attacking = true;
-                StartCoroutine(fireAttack(attack1));
-                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 3);
-            }
+            moving = false;
         }
+    }
 
-        if (Input.GetButton(PlayerNum + "Fire2"))
+    private void Jump()
+    {
+        if (Input.GetButton(PlayerNum + "Jump") && grounded)
         {
-            if (!attacking)
+            grounded = false;
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 2);
+            Vector3 jump = new Vector3(rb.velocity.x, 4f, 0.0f);
+            rb.velocity = jump;
+        }
+    }
+
+    private void Crouch()
+    {
+        if (Input.GetButton(PlayerNum + "Crouch"))
+        {
+            crouched = true;
+            runSpeed = crouchSpeed;
+
+            if (Input.GetButton(PlayerNum + "Fire1"))
             {
-                attacking = true;
-                StartCoroutine(fireAttack(attack2));                
+                attacking = true;                
+                chrAnimation.speed = (8 / atk3.waitFrames) * 2;
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 7);
+                StartCoroutine(fireAttack(attack3));
             }
+
+            if (!moving && !attacking)
+            {
+                SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 4);
+            }                                   
+        }
+        else
+        {
+            crouched = false;
+            runSpeed = speed;
         }
     }
 
@@ -176,6 +231,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.tag != PlayerNum + "Attack")
         {
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 6);
             AttackParameters collisionParams = collision.GetComponent<AttackParameters>();
             //get frame character was hit on
             float hitFrame = frame;
@@ -242,19 +298,21 @@ public class PlayerMovement : MonoBehaviour
     public IEnumerator resetStates(float frameStart, float stunnedFrames)
     {        
         yield return new WaitWhile(() => frameStart > frame - stunnedFrames);
-
-        stunned = false;
-        attacking = false;
+        chrAnimation.speed = 1;
+     
         if (crouched)
         {
             //crouch sprite
-            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 4);
         }
         else
         {
             //idle sprite
             SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
+
+        stunned = false;
+        attacking = false;
     }
 
     public IEnumerator fireAttack(GameObject attack)
