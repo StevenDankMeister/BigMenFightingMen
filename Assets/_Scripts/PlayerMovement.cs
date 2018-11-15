@@ -111,7 +111,8 @@ public class PlayerMovement : MonoBehaviour
             SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
 
-       
+        stopSlide();
+
         Crouch();
         Jump();
         MoveHorizontal();
@@ -217,7 +218,7 @@ public class PlayerMovement : MonoBehaviour
         {
             grounded = false;
             SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 2);
-            Vector3 jump = new Vector3(rb.velocity.x, 4f, 0.0f);
+            Vector3 jump = new Vector3(rb.velocity.x, 2f, 0.0f);
             rb.velocity = jump;
         }
     }
@@ -251,7 +252,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        stopSlide();
+        
     }
 
     void OnTriggerEnter2D(Collider2D collision)

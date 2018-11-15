@@ -92,7 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackType: 0
   damage: 5
-  waitFrames: 13
+  waitFrames: 15
   selfStunFrames: 20
   enemyStunFrames: 31
   attackForceLeft: {x: -2, y: 4}
