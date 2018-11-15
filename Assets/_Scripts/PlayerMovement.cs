@@ -32,6 +32,8 @@ public class PlayerMovement : MonoBehaviour
     AttackParameters atk3;
 
     AttackParameters attackParams;
+
+    SoundDB soundDB;
     
     //states
     [SerializeField] private bool attacking = false;
@@ -39,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool crouched = false;
     [SerializeField] private bool grounded = true;
     [SerializeField] private bool moving = false;
+    [SerializeField] private bool dead = false;
 
     //facing
     [SerializeField] private bool facingRight;
@@ -61,6 +64,8 @@ public class PlayerMovement : MonoBehaviour
         bound = GetComponent<BoxCollider2D>();       
         chrAnimation = GetComponent<Animator>();
 
+        soundDB = GetComponent<SoundDB>();
+
         crouchSpeed = speed / 2;
         runSpeed = speed;
         currentHP = maxHealth;
@@ -82,15 +87,25 @@ public class PlayerMovement : MonoBehaviour
         SpriteHandler.spriteHandler.characterDirection(facingLeft, facingRight, this.gameObject);
 
         //set sprite hitbox
-        SpriteHandler.spriteHandler.setHitbox(this.gameObject);
+        if (!dead)
+        {
+            SpriteHandler.spriteHandler.setHitbox(this.gameObject);
+        }
+        else{
+            bound.enabled = false;
+            rb.gravityScale = 0.01f;
+        }
+        
 
         //if stunned, character can't move or attack
-        if (stunned)
+        if (stunned || dead)
         {
             return;
         }
 
-        if (rb.velocity.x == 0 && rb.velocity.y == 0 && !crouched)
+        Death();
+
+        if (rb.velocity.x == 0 && rb.velocity.y == 0 && !crouched && !dead)
         {
             SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
@@ -101,6 +116,16 @@ public class PlayerMovement : MonoBehaviour
         StopHorizontal();
         Fire1();
         Fire2();
+    }
+
+    private void Death()
+    {
+        if (currentHP <= 0)
+        {
+            dead = true;
+            SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 9);
+            SoundHandler.soundHandler.PlaySound(SoundHandler.soundHandler.RandomSound(soundDB.deathSounds));
+        }
     }
 
     private void Fire1()
@@ -243,10 +268,11 @@ public class PlayerMovement : MonoBehaviour
             //remove all velocity to prevent sliding in air
             rb.velocity = Vector3.zero;
 
-            //get attack params
-
             currentHP = currentHP - collisionParams.damage;
             float hit = collision.transform.position.x;
+
+            
+            SoundHandler.soundHandler.PlaySound(SoundHandler.soundHandler.RandomSound(soundDB.hitSounds));
 
             if (hit > this.transform.position.x)
             {
@@ -336,6 +362,7 @@ public class PlayerMovement : MonoBehaviour
             print("attack cancelled");
             yield break;
         }
+        SoundHandler.soundHandler.PlaySound(SoundHandler.soundHandler.RandomSound(soundDB.attackSounds));
 
         print("starting attack");
         Vector3 playerpos = this.transform.position;
