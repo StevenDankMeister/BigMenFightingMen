@@ -91,11 +91,12 @@ public class PlayerMovement : MonoBehaviour
         {
             SpriteHandler.spriteHandler.setHitbox(this.gameObject);
         }
-        else{
+        else
+        {
             bound.enabled = false;
             rb.gravityScale = 0.01f;
         }
-        
+
 
         //if stunned, character can't move or attack
         if (stunned || dead)
@@ -110,6 +111,7 @@ public class PlayerMovement : MonoBehaviour
             SpriteHandler.spriteHandler.SetAnimation(chrAnimation, 0);
         }
 
+       
         Crouch();
         Jump();
         MoveHorizontal();
