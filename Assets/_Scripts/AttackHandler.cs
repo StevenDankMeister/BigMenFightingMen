@@ -32,15 +32,15 @@ public class AttackHandler : MonoBehaviour {
 
         if(attackType == "High")
         {
-            attackPos = new Vector3(playerPos.x + bound.bounds.extents.x, playerPos.y + bound.bounds.extents.y, playerPos.z);
+            attackPos = new Vector3(playerPos.x + bound.bounds.extents.x + 0.4f, playerPos.y + bound.bounds.extents.y, playerPos.z);
         }
         else if (attackType == "Mid")
         {
-            attackPos = new Vector3(playerPos.x + bound.bounds.extents.x, playerPos.y, playerPos.z);
+            attackPos = new Vector3(playerPos.x + bound.bounds.extents.x + 0.4f, playerPos.y, playerPos.z);
         }
         else if (attackType == "Low")
         {
-            attackPos = new Vector3(playerPos.x + bound.bounds.extents.x, playerPos.y - bound.bounds.extents.y, playerPos.z);
+            attackPos = new Vector3(playerPos.x + bound.bounds.extents.x + 0.4f, playerPos.y - bound.bounds.extents.y, playerPos.z);
         }
         
         return attackPos;

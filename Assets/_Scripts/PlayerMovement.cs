@@ -375,7 +375,7 @@ public class PlayerMovement : MonoBehaviour
         if (facingLeft)
         {
             //spawn pos at other side
-            spawnPos.x = playerpos.x - bound.bounds.extents.x;        
+            spawnPos.x = playerpos.x - bound.bounds.extents.x - 0.4f;        
         }
         AttackHandler.attackHandler.CreateAttack(spawnPos, attack, PlayerNum + "Attack");
         rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
@@ -389,7 +389,6 @@ public class PlayerMovement : MonoBehaviour
         */
 
         //wait before stun is removed
-        //yield return new WaitWhile(() => startFrame > frame - stunTime);
         StartCoroutine(resetStates(startFrame, stunTime));
     }
 }

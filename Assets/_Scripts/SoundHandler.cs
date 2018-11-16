@@ -7,12 +7,13 @@ public class SoundHandler : MonoBehaviour {
     AudioSource audioSource;
     public static SoundHandler soundHandler;
 
-    private static bool created;
+    private static bool created = false;
 
 	// Use this for initialization
 	void Start () {
         if (!created)
         {
+            created = true;
             DontDestroyOnLoad(this.gameObject);
         }
         else if (created)

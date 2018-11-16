@@ -141,7 +141,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 5d9c0cedc88ba8d47a8a53c237993e0f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -243,7 +243,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 89419846}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.206, y: -0.806, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.4, y: 2.4, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1411,9 +1411,9 @@ GameObject:
   - component: {fileID: 1498279043}
   - component: {fileID: 1498279042}
   - component: {fileID: 1498279041}
-  - component: {fileID: 1498279039}
   - component: {fileID: 1498279040}
   - component: {fileID: 1498279045}
+  - component: {fileID: 1498279039}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Player
@@ -1430,7 +1430,7 @@ Animator:
   m_GameObject: {fileID: 1498279038}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1c42a18279103174d992be68386e9664, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9cda6c6e7a28ce1438ebeeb94b7fc304, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1499,7 +1499,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e80d2a8c79a896c4f97390e8e7eda146, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d26c47568bf22864892a226c7727d1c8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1581,16 +1581,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitSounds:
-  - {fileID: 8300000, guid: ebb2953702b59d84f8b0063aa600b0dc, type: 3}
-  - {fileID: 8300000, guid: 7b830b4b0f1e4cf4ba1d264dd5b2085e, type: 3}
-  - {fileID: 8300000, guid: 9293b38f1c876a946b70f7a112826e74, type: 3}
+  - {fileID: 8300000, guid: 7dc4b1313a196fb4b9d5aa200a06ee61, type: 3}
+  - {fileID: 8300000, guid: 124d28d4439e419498500ca45a267cdd, type: 3}
+  - {fileID: 8300000, guid: 0dce6fa3e43345c4d815169396e63ad0, type: 3}
   attackSounds:
-  - {fileID: 8300000, guid: 90ddb7c949ce4074cab120d5e282bc8c, type: 3}
-  - {fileID: 8300000, guid: 98e5ce3ddff8af4468001e39a947d00a, type: 3}
-  - {fileID: 8300000, guid: d0a7220282219674eb23225147b9e113, type: 3}
+  - {fileID: 8300000, guid: 7a814b5230a0fd349bd8482f184e3bc7, type: 3}
+  - {fileID: 8300000, guid: a2764a66fdceec64782b2e0bc8feb2f7, type: 3}
+  - {fileID: 8300000, guid: 1986b1aa19b315b4f929ea4083398faf, type: 3}
   deathSounds:
-  - {fileID: 8300000, guid: 3cf2d4b4588fa7f4185690182c3ddddd, type: 3}
-  - {fileID: 8300000, guid: 1633628449b44bb40a9f6c9670fdd656, type: 3}
+  - {fileID: 8300000, guid: 3d5be6fe7fab4b24a9e2033e789e2150, type: 3}
+  - {fileID: 8300000, guid: d87fc7b5a6b065f4183a70592e93fd33, type: 3}
 --- !u!1 &1546535725
 GameObject:
   m_ObjectHideFlags: 0
