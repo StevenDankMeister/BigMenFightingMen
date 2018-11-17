@@ -10,7 +10,7 @@ public class SoundHandler : MonoBehaviour {
     private static bool created = false;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         if (!created)
         {
             created = true;
@@ -19,14 +19,17 @@ public class SoundHandler : MonoBehaviour {
         else if (created)
         {
             Destroy(this.gameObject);
-        }
+        }        
+    }
 
+    void Start()
+    {
         soundHandler = GetComponent<SoundHandler>();
         audioSource = GetComponent<AudioSource>();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 

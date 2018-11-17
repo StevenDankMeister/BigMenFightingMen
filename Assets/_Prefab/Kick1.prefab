@@ -91,12 +91,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackType: 0
-  damage: 5
-  waitFrames: 15
-  selfStunFrames: 20
-  enemyStunFrames: 31
-  attackForceLeft: {x: -2, y: 4}
-  attackForceRight: {x: 2, y: 4}
+  damage: 10
+  waitFrames: 22
+  selfStunFrames: 45
+  enemyStunFrames: 20
+  attackForceLeft: {x: -2, y: 5}
+  attackForceRight: {x: 2, y: 5}
 --- !u!212 &212429248493564428
 SpriteRenderer:
   m_ObjectHideFlags: 1

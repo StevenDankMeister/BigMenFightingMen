@@ -94,9 +94,9 @@ MonoBehaviour:
   damage: 5
   waitFrames: 12
   selfStunFrames: 20
-  enemyStunFrames: 31
-  attackForceLeft: {x: -2, y: 2}
-  attackForceRight: {x: 2, y: 2}
+  enemyStunFrames: 21
+  attackForceLeft: {x: -1, y: 2}
+  attackForceRight: {x: 1, y: 2}
 --- !u!212 &212858967161928454
 SpriteRenderer:
   m_ObjectHideFlags: 1
